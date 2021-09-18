@@ -1,0 +1,87 @@
+{% extends "app_template.html" %}
+<!-- -->
+{% block title %} Prototipo 1 {% endblock %}
+<!-- -->
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/cancellation.css') }}"> {% endblock %}
+<!-- -->
+{% block main %}
+<!-- -->
+
+{% include "resources/screen_size_msg.html" %}
+<!-- -->
+{% if args.instructions %}
+<div class="modal fade" id="instructions" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Instrucciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closemodal()"></button>
+            </div>
+            <div class="modal-body">
+                {% for x in args.instructions %}
+                <p>{{ x }}</p>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closemodal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- -->
+
+<div class="bag" id="bag">
+
+    <div id="countdown">
+        <p id="countdown_text"></p>
+    </div>
+
+    <div id="training" class="test_container">
+        <h5 align="center">Haga click sobre todos los símbolos {% include 'resources/' + args.target_symbol %} </h5>
+        <table class="table borderless">
+            <tbody>
+                {% for i in range(0,args.table_training|length) %}
+                <tr align="center">
+                    {% for j in range(0,args.table_training[i]|length) %}
+                    <td>
+                        {% with i=i, j=j %} {% include 'resources/' + args.table_training[i][j] %} {% endwith %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    <!-- -->
+
+    <div id="test" class="test_container">
+        <h5>Haz click sobre todos los símbolos {% include 'resources/' + args.target_symbol %} </h5>
+        <table class="table borderless">
+            <tbody>
+                {% for i in range(0,args.table_test|length) %}
+                <tr>
+                    {% for j in range(0,args.table_test[i]|length) %}
+                    <td>
+                        {% with i=i, j=j %} {% include 'resources/' + args.table_test[i][j] %} {% endwith %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- -->
+    <p id="demo"></p>
+</div>
+
+
+{% endblock %}
+<!-- -->
+
+{% block script %}
+<script id="cancellation" type="text/javascript" src="{{ url_for('static',filename='js/cancellation.js') }}" target_number="{{ args.target_number}}" n_training="{{ args.n_training }}" n_test="{{ args.n_test }}"></script>
+<script src="https://kit.fontawesome.com/12473761cd.js" crossorigin="anonymous"></script>
+{% endblock %}

@@ -1,0 +1,83 @@
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    color: black;
+    background-color: #f8f9fb;
+}
+
+.card {
+    border-radius: 4px;
+    margin: 20px;
+    transition: .3s transform cubic-bezier(.155, 1.105, .295, 1.12), .3s box-shadow, .3s -webkit-transform cubic-bezier(.155, 1.105, .295, 1.12);
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .12), 0 4px 8px rgba(0, 0, 0, .06);
+}
+
+.card-img-top {
+    margin-top: 15px;
+}
+
+.form-container,
+.header-container {
+    margin: auto;
+    padding: 30px;
+    background-color: rgb(231, 231, 231);
+    width: 70%;
+    margin-top: 3%;
+}
+
+.row {
+    margin-top: 15px;
+}
+
+.submit-btn {
+    margin-top: 15px;
+}
+
+h1,
+h5 {
+    text-align: center;
+    text-shadow: lavender;
+    margin: 10px;
+}
+
+#valid-msg {
+    margin-left: 50px;
+    margin-top: 25px;
+}
+
+.collapse {
+    padding: 3px;
+}
+
+.col {
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+footer {
+    position: static;
+    bottom: 0;
+    background-color: rgba(197, 197, 197, 0.466);
+    width: 100%;
+    height: 45px;
+    text-align: center;
+}
+
+footer p {
+    position: relative;
+    top: 25%;
+}
+
+#screen_msg {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    bottom: 50%;
+    width: 100%;
+}
