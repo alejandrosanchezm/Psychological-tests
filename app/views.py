@@ -206,7 +206,10 @@ def download_results():
     to_join.append(users)
     tmp = pd.concat(to_join, axis=1)
     to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
-    tmp = tmp[tmp.columns.drop(to_remove)]
+    try:
+        tmp = tmp[tmp.columns.drop(to_remove)]
+    except:
+        pass
 
     filename ="results.xlsx"
     tmp.to_excel(  app.config["TMP_FILES"] + filename)
