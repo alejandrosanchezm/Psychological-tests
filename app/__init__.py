@@ -18,6 +18,7 @@ tests_data["F"]["data"]["table_training"] = [["svg" + str(x) + ".html" for x in 
 tests_data["F"]["data"]["table_test"] = [["svg" + str(x) + ".html" for x in i ] for i in tests_data["F"]["data"]["table_test"]]
 
 CORS(app)
-db = MongoClient('127.0.0.1', 27017)
+#db = MongoClient('127.0.0.1', 27017)
+db = MongoClient("mongodb+srv://admin:eKB139Mm@cluster0.nh98u.mongodb.net/trail_making_test?retryWrites=true&w=majority")
 
 from app import views
