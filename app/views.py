@@ -83,7 +83,7 @@ def store_data():
     if 'id' in session:
         
         if 'results' in request.form:
-            
+
             data = json.loads(request.form['results'])
             try:
 
@@ -181,10 +181,7 @@ def download_results():
     filename ="results.xlsx"
     tmp.to_excel(  app.config["TMP_FILES"] + filename)
 
-    try:
-        return send_from_directory(app.config["TMP_FILES"], filename, as_attachment=True)
-    except Exception as e:
-        return "OK", 200
+    return send_from_directory(app.config["TMP_FILES"], filename, as_attachment=True)
 
 @app.errorhandler(500)
 def error500(e):
