@@ -15,8 +15,6 @@
 
 var valid_data = false;
 
-var valid_name = false;
-var valid_dni = false;
 
 var timer = null;
 
@@ -44,7 +42,7 @@ function donetyping() {
     var surname = document.getElementById("surname").value;
     var dni = document.getElementById("dni").value;
 
-    if (name != "" && surname != "" && dni != "" && validateDNI(dni)) {
+    if (name != "" && surname != "" && dni != "") {
         $.ajax("/check_if_valid_data", {
             type: "POST",
             data: {
@@ -69,16 +67,7 @@ function donetyping() {
                 }
             }
         });
-    } else if (validateDNI(dni) == false) {
-        if (document.getElementById("valid-msg").childNodes.length == 0) {
-            var newtext = document.createTextNode("Introduce un DNI válido.");
-            valid_data = false;
-            document.getElementById("rst-btn").disabled = true;
-            document.getElementById("valid-msg").appendChild(newtext)
-        }
     }
-
-
 };
 
 
@@ -90,32 +79,17 @@ $("#form").on("change", function() {
     }
 });
 
-function validateDNI(dni) {
-    var numero,
-        let, letra;
-    var expresion_regular_dni = /^[XYZ]?\d{5,8}[A-Z]$/;
-
-    dni = dni.toUpperCase();
-
-    if (expresion_regular_dni.test(dni) === true) {
-        numero = dni.substr(0, dni.length - 1);
-        numero = numero.replace('X', 0);
-        numero = numero.replace('Y', 1);
-        numero = numero.replace('Z', 2);
-        let = dni.substr(dni.length - 1, 1);
-        numero = numero % 23;
-        letra = 'TRWAGMYFPDXBNJZSQVHLCKET';
-        letra = letra.substring(numero, numero + 1);
-        if (letra !=
-            let) {
-            //alert('Dni erroneo, la letra del NIF no se corresponde');
-            return false;
-        } else {
-            //alert('Dni correcto');
-            return true;
+function validate() {
+    var f1 = document.getElementById("name");
+    var f2 = document.getElementById("surname");
+    var f3 = document.getElementById("education");
+    var f4 = document.getElementById("dni");
+    var f5 = document.getElementById("place");
+    var ferror = [f1, f2, f3, f4, f5];
+    var i;
+    for (i = 0; i < ferror.length; i++) {
+        if (ferror[i].value.length < 1) {
+            ferror[i].style.backgroundColor = "red";
         }
-    } else {
-        //alert('Dni erroneo, formato no válido');
-        return false;
     }
 }

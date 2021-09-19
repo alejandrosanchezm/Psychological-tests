@@ -31,7 +31,7 @@
         <div class="row">
             <div class="col">
                 <div class="form-floating" data-validate="surname">
-                    <input autocomplete="off" class="form-control" type="text" id="dni" name="dni" placeholder="Número de DNI" pattern="[0-9]{8}[A-Za-z]{1}" required>
+                    <input autocomplete="off" class="form-control" type="text" id="dni" name="dni" placeholder="Número de DNI" required>
                     <label for="surname" class="form-label">Número de DNI</label>
                 </div>
             </div>
@@ -41,19 +41,19 @@
             <div class="col">
                 <label for="gender" class="form-label">Género</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="gender" id="masculino" value="masculino">
+                    <input class="form-check-input" type="radio" name="gender" id="masculino" value="masculino" required>
                     <label class="form-check-label" for="masculino">Masculino</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="gender" id="femenino" value="femenino" checked>
+                    <input class="form-check-input" type="radio" name="gender" id="femenino" value="femenino">
                     <label class="form-check-label" for="femenino">Femenino</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="gender" id="other" value="other" checked>
+                    <input class="form-check-input" type="radio" name="gender" id="other" value="other">
                     <label class="form-check-label" for="other">Otro</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="gender" id="undefined" value="undefined" checked>
+                    <input class="form-check-input" type="radio" name="gender" id="undefined" value="undefined">
                     <label class="form-check-label" for="undefined">Prefiero no decirlo</label>
                 </div>
             </div>
@@ -74,20 +74,22 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col">
-                <div class="form-floating" data-validate="ocupation">
-                    <select class="form-select" aria-label="Default select example" name="ocupation" id="ocupation">
-                        <option selected value="0">Mi ocupación diaria es...</option>
-                        <option value="manual">Predominantemente manual (uso de fuerza física) </option>
-                        <option value="no manual">Predominantemente no manual (sin uso de fuerza física)</option>
-                      </select>
+                <label for="ocupation" class="form-label">Mi ocupación diaria es...</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="manual" id="manual" value="manual" required>
+                    <label class="form-check-label" for="manual">Predominantemente manual (uso de fuerza física) </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="manual" id="no manual" value="no manual">
+                    <label class="form-check-label" for="no manual">Predominantemente no manual (sin uso de fuerza física)</label>
                 </div>
             </div>
         </div>
-
         <div class="d-flex justify-content-center">
-            <button type="submit" id="rst-btn" class="btn btn-light submit-btn" disabled>Acceder a los tests</button>
+            <button type="submit" id="rst-btn" class="btn btn-light submit-btn" onsubmit="validate()" disabled>Acceder a los tests</button>
         </div>
     </form>
 </div>

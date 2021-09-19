@@ -27,19 +27,26 @@ svg {
     padding: 3px;
     stroke: black;
     stroke-width: 0.3;
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
 }
 
 input[type="checkbox"] {
     display: none;
 }
 
-input[type="checkbox"]:checked+svg {
+input[type="checkbox"][value="2"]:checked+svg {
     padding: 4px;
     stroke: rgb(190, 190, 190);
     stroke-width: 0.2;
     color: rgb(190, 190, 190);
+}
+
+input[type="checkbox"]:checked+svg {
+    padding: 4px;
+    stroke: rgb(253, 7, 7);
+    stroke-width: 0.2;
+    color: rgb(143, 21, 21);
 }
 
 .borderless td,
