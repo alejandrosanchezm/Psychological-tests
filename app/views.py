@@ -193,8 +193,8 @@ def download_results():
         res = update_results_files()
         if res == None:
         
-            flash("Todavía no hay suficientes datos.")
-            return redirect(url_for(request.url))
+            flash("Todavía no hay suficientes datos.","Warning")
+            return redirect(url_for("dashboard"))
 
     return send_file(os.getcwd() + app.config["RESULTS_FILE"])
 
@@ -282,8 +282,8 @@ def show_results():
         res = update_results_files()
         if res == None:
         
-            flash("Todavía no hay suficientes datos.")
-            return redirect(url_for(request.url))
+            flash("Todavía no hay suficientes datos.","Warning")
+            return redirect(url_for("dashboard"))
 
 
     df = pd.read_pickle(os.getcwd() + app.config["PICKLE"], compression='infer', storage_options=None)
