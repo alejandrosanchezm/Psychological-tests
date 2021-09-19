@@ -190,7 +190,11 @@ def download_results():
 
     if last_db_update != last_file_update:
 
-        update_results_files()
+        res = update_results_files()
+        if res == None:
+        
+            flash("Todavía no hay suficientes datos.")
+            return redirect(url_for(request.url))
 
     return send_file(os.getcwd() + app.config["RESULTS_FILE"])
 
@@ -275,7 +279,12 @@ def show_results():
 
     if last_db_update != last_file_update:
 
-        update_results_files()
+        res = update_results_files()
+        if res == None:
+        
+            flash("Todavía no hay suficientes datos.")
+            return redirect(url_for(request.url))
+
 
     df = pd.read_pickle(os.getcwd() + app.config["PICKLE"], compression='infer', storage_options=None)
 
@@ -306,10 +315,10 @@ def update_results_files():
     results =  pd.DataFrame(data = list(db.trail_making_test.results.find()))
 
     if users.empty:
-        return "Todavía no se han registrado usuarios.", 200
+        return None
 
     elif results.empty:
-        return "Todavía no hay resultados de tests.", 200
+        return None
 
     else:
         users = users.set_index('id').drop('_id',axis="columns")
@@ -326,3 +335,4 @@ def update_results_files():
 
     tmp.to_excel(os.getcwd() + app.config["RESULTS_FILE"])
     tmp.to_pickle(os.getcwd() + app.config['PICKLE'])
+    return True
