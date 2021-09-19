@@ -30,6 +30,7 @@ let seconds = 0;
 
 let correct_clicked = [];
 let error_clicked = [];
+let errors;
 let errors = {
     'desclickados': {},
     'errores': {},
@@ -173,12 +174,14 @@ function test_logic(x) {
 
         if (error_clicked.includes(x.id)) {
             error_clicked = arrayRemove(error_clicked, x.id);
+            errors--;
             if (n_test == 0 && error_clicked.length == 0) {
                 correct_clicked = [];
                 start_test();
             }
         } else {
             error_clicked.push(x.id);
+            errors++;
             if (x.id in errors['errores']) {
                 errors['errores'][x.id]++;
             } else {
@@ -278,7 +281,8 @@ function sendDataToBE() {
             'endTime': time,
             'errors': errors,
             'type': "F",
-            'n_test': n_test
+            'n_test': n_test,
+            "final_errors": errors
         };
 
         $.ajax({
