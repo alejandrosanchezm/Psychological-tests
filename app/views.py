@@ -65,7 +65,7 @@ def tests(test_type):
         # Buscamos qué plantilla se tiene que renderizar
         template = tests_data[test_type]['template']
 
-        # {% include {{ args.table[i][j].svg }} %}
+        # 
         args = prepare_args(test_type)
 
         # Renderizamos la plantilla
@@ -83,6 +83,7 @@ def store_data():
     if 'id' in session:
         
         if 'results' in request.form:
+            
             data = json.loads(request.form['results'])
             try:
 
@@ -159,6 +160,40 @@ def logout():
     session.clear()
     return redirect(url_for("form"))
 
+@app.route("/download_results", methods = ["GET"])
+def download_results():
+
+    users =  pd.DataFrame(data = list(db.trail_making_test.users.find())).set_index('id')
+    results =  pd.DataFrame(data = list(db.trail_making_test.results.find())).set_index('id')
+    
+    users = users.drop('_id',axis="columns")
+    results = results.drop('_id',axis="columns")
+
+    to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
+    to_join.append(users)
+    tmp = pd.concat(to_join, axis=1)
+    to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
+    try:
+        tmp = tmp[tmp.columns.drop(to_remove)]
+    except:
+        pass
+
+    filename ="results.xlsx"
+    tmp.to_excel(  app.config["TMP_FILES"] + filename)
+
+    try:
+        return send_from_directory(app.config["TMP_FILES"], filename, as_attachment=True)
+    except Exception as e:
+        return "OK", 200
+
+@app.errorhandler(500)
+def error500(e):
+    return render_template('error/500.html'), 500
+
+@app.errorhandler(404)
+def error404(e):
+    return render_template('error/404.html'), 404
+
 def prepare_args(test_type):
 
     # Obtenemos las instrucciones correspondientes
@@ -192,29 +227,3 @@ def prepare_args(test_type):
         }
 
     return args
-
-@app.route("/download_results", methods = ["GET"])
-def download_results():
-
-    users =  pd.DataFrame(data = list(db.trail_making_test.users.find())).set_index('id')
-    results =  pd.DataFrame(data = list(db.trail_making_test.results.find())).set_index('id')
-    
-    users = users.drop('_id',axis="columns")
-    results = results.drop('_id',axis="columns")
-
-    to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
-    to_join.append(users)
-    tmp = pd.concat(to_join, axis=1)
-    to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
-    try:
-        tmp = tmp[tmp.columns.drop(to_remove)]
-    except:
-        pass
-
-    filename ="results.xlsx"
-    tmp.to_excel(  app.config["TMP_FILES"] + filename)
-
-    try:
-        return send_from_directory(app.config["TMP_FILES"], filename, as_attachment=True)
-    except Exception as e:
-        return "OK", 200
