@@ -52,7 +52,7 @@
                 "test_image": "imgs/E.png",
                 "template": "cancellation.html",
                 "data": {
-                    "target_symbol": 3,
+                    "target_symbol": 2,
                     "table_training": [
                         [6],
                         [3],

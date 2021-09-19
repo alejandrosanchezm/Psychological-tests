@@ -1,10 +1,12 @@
 from app import app, db, tests_data
-from flask import render_template, request, redirect, url_for, session, send_from_directory, flash
+from flask import render_template, request, redirect, url_for, session, send_file, flash
 import json
 import uuid
 import pandas as pd
 import re
 from functools import wraps
+from datetime import date
+import os
 
 def authenticate(f):
     @wraps(f)
@@ -128,6 +130,8 @@ def form():
         # Añadimos el identificador de sesión a las cookies y a la bbdd
         data['id'] = session['id'] = str(uuid.uuid4())
 
+        data['date'] =  date.today().strftime("%d/%m/%Y")
+
         # Guardamos los datos en la bbdd
         db.trail_making_test.users.insert_one(data)
 
@@ -163,22 +167,45 @@ def logout():
 @app.route("/download_results", methods = ["GET"])
 def download_results():
 
-    users =  pd.DataFrame(data = list(db.trail_making_test.users.find())).set_index('id')
-    results =  pd.DataFrame(data = list(db.trail_making_test.results.find())).set_index('id')
-    
-    users = users.drop('_id',axis="columns")
-    results = results.drop('_id',axis="columns")
+    users =  pd.DataFrame(data = list(db.trail_making_test.users.find()))
+    results =  pd.DataFrame(data = list(db.trail_making_test.results.find()))
+
+    if users.empty:
+        return "Todavía no se han registrado usuarios.", 200
+
+    elif results.empty:
+        return "Todavía no hay resultados de tests.", 200
+
+    else:
+        users = users.set_index('id').drop('_id',axis="columns")
+        results = results.set_index('id').drop('_id',axis="columns")
 
     to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
     to_join.append(users)
     tmp = pd.concat(to_join, axis=1)
+
+    to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
+    for x in to_remove:
+        if x in tmp.columns:
+            del tmp[x]
+
+    filename ="results.xlsx"
+    tmp.to_excel(os.getcwd() + app.config["RESULTS_FILE"])
+    print(os.getcwd() + app.config["RESULTS_FILE"])
+    return send_file(os.getcwd() + app.config["RESULTS_FILE"])
+    """
+
+    to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
+    to_join.append(users)
+    tmp = pd.concat(to_join, axis=1)
+
     to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
     for x in to_remove:
         del tmp[x]
 
-    filename ="results.xlsx"
-    tmp.to_excel(  app.config["TMP_FILES"] + filename)
-    return send_from_directory(app.config["TMP_FILES"], filename, as_attachment=True)
+
+    """
+    return "OK", 200
 
 @app.errorhandler(500)
 def error500(e):

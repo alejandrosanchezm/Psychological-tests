@@ -578,11 +578,6 @@ function closemodal() {
     $('#instructions').modal('hide');
 }
 
-$(window).on('load', function() {
-    if (document.body.contains(document.getElementById("instructions"))) {
-        $('#instructions').modal('show');
-    }
-});
 
 function show_instructions() {
 
