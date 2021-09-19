@@ -6,7 +6,16 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-link active" aria-current="page" href="/dashboard">Inicio</a>
+                <!---->
+                {% if args.admin %}
+                <!---->
+                <a class="nav-link" href="/show_results">Ver resultados</a>
+                <a class="nav-link" href="/download_results">Descargar resultados</a>
+                <!---->
+                {% endif %}
+                <!---->
                 <a class="nav-link" href="/logout">Cerrar Sesión</a>
+
             </div>
         </div>
     </div>

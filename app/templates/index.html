@@ -2,13 +2,16 @@
 <!-- -->
 {% block title %} {{ args.title }} {% endblock %}
 <!-- -->
-{% block body %} {% include "resources/navbar.html" ignore missing %} {% endblock %}
+{% block body %} {% with args = args %} {% include "resources/navbar.html" ignore missing %} {% endwith %}
+
+<!-- -->
+{% endblock %}
+
 <!-- -->
 {% block centered %}
 <!-- -->
 {% for b in args.tests %}
-
-<div class="card box-shadow shadow" style="width: 18rem;">
+<div class="card test_card box-shadow shadow" style="width: 18rem;">
     <img class="card-img-top" width="262" height="148" src="{{ url_for('static',filename=b.test_image) }}" alt="Card image cap">
     <div class="card-body d-flex flex-column" onclick="redirect_to_test('{{b.completed}}',' {{b.test_type }}')">
         <h5 class="card-title">{{ b.test_name }}</h5>

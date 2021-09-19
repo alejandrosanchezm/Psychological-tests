@@ -1,0 +1,81 @@
+{% extends "app_template.html" %}
+<!-- -->
+{% block title %} {{ args.title }} {% endblock %}
+<!-- -->
+{% block body %} {% with args = args %}
+<!-- -->
+
+{% include "resources/navbar.html" ignore missing %}
+<!-- -->
+
+{% endwith %}
+<!-- -->
+
+{% endblock %}
+<!-- -->
+
+{% block main %}
+
+<table class="dataframe table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                Número de usuarios registrados:
+            </th>
+            <th>
+                Número de tests A completados:
+            </th>
+            <th>
+                Número de tests B completados:
+            </th>
+            <th>
+                Número de tests C completados:
+            </th>
+            <th>
+                Número de tests D completados:
+            </th>
+            <th>
+                Número de tests E completados:
+            </th>
+            <th>
+                Número de tests F completados:
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                {{ args.user_number }}
+            </td>
+            <td>
+                {{ args.A_number }}
+            </td>
+            <td>
+                {{ args.B_number }}
+            </td>
+            <td>
+                {{ args.C_number }}
+            </td>
+            <td>
+                {{ args.D_number }}
+            </td>
+            <td>
+                {{ args.E_number }}
+            </td>
+            <td>
+                {{ args.F_number }}
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+<!-- -->
+{{ args.html }}
+
+<!-- -->
+{% endblock %}
+
+<!-- -->
+{% block script %}
+<script type="text/javascript" id="tmt" src="{{ url_for('static',filename='js/menu.js') }}" test_type='{{ test_type }}'></script>
+{% endblock %}

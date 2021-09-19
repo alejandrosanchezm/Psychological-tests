@@ -5,6 +5,7 @@ from config import ProductionConfig
 import datetime
 import json
 import numpy as np
+from datetime import date
 
 app = Flask(__name__,static_folder='static')
 app.config.from_object(ProductionConfig)
@@ -16,6 +17,9 @@ tests_data["F"]["data"]["n_test"] = list(np.asarray(tests_data["F"]["data"]["tab
 tests_data["F"]["data"]["n_training"] = list(np.asarray(tests_data["F"]["data"]["table_training"]).reshape(-1)).count(tests_data["F"]["data"]["target_symbol"])
 tests_data["F"]["data"]["table_training"] = [["svg" + str(x) + ".html" for x in i ] for i in tests_data["F"]["data"]["table_training"]]
 tests_data["F"]["data"]["table_test"] = [["svg" + str(x) + ".html" for x in i ] for i in tests_data["F"]["data"]["table_test"]]
+
+last_db_update =  date.today()
+last_file_update = date.today() - datetime.timedelta(days=1)
 
 CORS(app)
 #db = MongoClient('127.0.0.1', 27017)
