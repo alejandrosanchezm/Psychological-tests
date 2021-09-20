@@ -1,76 +1,100 @@
-from app import app, db, tests_data, last_db_update, last_file_update
+from app import *
+from app.decorators import *
+from app.controller import *
 from flask import render_template, request, redirect, url_for, session, send_file, flash, abort, Markup
+
 import json
 import uuid
 import pandas as pd
 import re
-from functools import wraps
 from datetime import date
 import os
 from jinja2 import TemplateNotFound
-from hashlib import sha256
 
-def logged(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if 'id' not in session:
-            flash("Tienes que registrarte para acceder ahí.", "Danger")
-            return redirect(url_for("form"))     
-        return f(*args, **kwargs)
-    return wrapper
 
-def authenticate(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if 'id' not in session:
-            flash("Tienes que registrarte para acceder ahí.", "Danger")
-            return redirect(url_for("form"))
-        else:
-            if session['id'] == app.config['ADMIN_ID']:
-                return f(*args, **kwargs)
-            else:
-                flash("Tienes que ser administrador para acceder ahí.", "Danger")
-                return redirect(url_for(request.url))              
-    return wrapper
-
-@app.after_request
-def add_header(r):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    r.headers['Cache-Control'] = 'public, max-age=0'
-    return r
-
-@app.route("/dashboard", methods = ["GET"])
+@app.route("/download_results", methods = ["GET"])
 @logged
-def dashboard():
+@authenticate
+def download_results():
+
+    if last_db_update != last_file_update:
+
+        res = update_results_files()
+        if res == None:
         
-    # Buscamos qué test han sido ya copletados por el usuario
-    completed = [x['type'] for x in db.trail_making_test.results.find({'id': session['id']})]
+            flash("Todavía no hay suficientes datos.","Warning")
+            return redirect(url_for("dashboard"))
 
-    def isCompleted(x,completed):
-        if x['test_type'] in completed:
-            x['completed'] = True
+    return send_file(os.getcwd() + app.config["RESULTS_FILE"])
+
+@app.route('/login', methods=['GET','POST'])
+def admin_login():
+
+    # Si se hace una petición GET
+    if request.method == 'GET':
+        try:
+            return render_template('login.html')
+        except TemplateNotFound:
+            abort(404)
+
+    # Si se hace una petición POST
+    elif request.method == 'POST':
+
+        # Recogemos los valores del formulario
+        user = request.values['user']
+        password =  request.values['password']
+
+        # Comprobamos si existe en la base de datos
+        if user == app.config['ADMIN_USER'] and password == app.config['ADMIN_PASS']:
+
+            # Establecemos una cookie de sesión con el identificador del usuario
+            session['id'] = app.config['ADMIN_ID']
+
+            # Si existe, lo redirigimos al dasboard
+            return redirect(url_for('dashboard'))
+
+        # En caso de que no exista, lanzamos una alerta y lo redirigimos al login
         else:
-            x['completed'] = False
-        return x
+            flash("Usuario no encontrado.", "Warning")
+            return redirect(url_for('admin_login'))
 
-    my_data = [isCompleted(x,completed) for x in tests_data.values()]
+@app.route('/show_results', methods=['GET','POST'])
+@logged
+@authenticate
+def show_results():
+
+    if last_db_update != last_file_update:
+
+        res = update_results_files()
+        if res == None:
+        
+            flash("Todavía no hay suficientes datos.","Warning")
+            return redirect(url_for("dashboard"))
+
+
+    df = pd.read_pickle(os.getcwd() + app.config["PICKLE"], compression='infer', storage_options=None)
+
+    html = Markup(df.to_html(classes=["table-bordered", "table-striped", "table-hover"]))
 
     # Preparamos los argumentos de la página
     args = {
         'title':'Prototipo',
-        'tests':my_data
+        'html':html,
+        'user_number':df['name'].count(),
+        'A_number':df['endTime_A'].count(),
+        'B_number':df['endTime_B'].count(),
+        'C_number':df['endTime_C'].count(),
+        'D_number':df['endTime_D'].count(),
+        'E_number':df['endTime_E'].count(),
+        'F_number':df['endTime_F'].count()
     }
+
 
     if session['id'] == app.config['ADMIN_ID']:
         args['admin'] = True
 
-    return render_template("index.html",args=args)
+    return render_template("results.html", args = args)
+
 
 @app.route("/tests/<test_type>", methods = ["GET"])
 @logged
@@ -82,7 +106,7 @@ def tests(test_type):
         # Buscamos qué plantilla se tiene que renderizar
         template = tests_data[test_type]['template']
 
-        # 
+        # Preparamos los argumentos
         args = prepare_args(test_type)
 
         # Renderizamos la plantilla
@@ -124,6 +148,34 @@ def store_data():
 
         return "Not valid request", 400
 
+
+@app.route("/dashboard", methods = ["GET"])
+@logged
+def dashboard():
+        
+    # Buscamos qué test han sido ya copletados por el usuario
+    completed = [x['type'] for x in db.trail_making_test.results.find({'id': session['id']})]
+
+    def isCompleted(x,completed):
+        if x['test_type'] in completed:
+            x['completed'] = True
+        else:
+            x['completed'] = False
+        return x
+
+    my_data = [isCompleted(x,completed) for x in tests_data.values()]
+
+    # Preparamos los argumentos de la página
+    args = {
+        'title':'Prototipo',
+        'tests':my_data
+    }
+
+    if session['id'] == app.config['ADMIN_ID']:
+        args['admin'] = True
+
+    return render_template("public/dashboard.html",args=args)
+
 @app.route("/",methods=["GET", "POST"])
 def form():
 
@@ -132,7 +184,7 @@ def form():
         args = {
             'title': 'Prototipo1'
         }
-        return render_template("form.html", args = args)
+        return render_template("public/form.html", args = args)
         
     elif request.method == "POST":
         
@@ -176,163 +228,10 @@ def check_if_valid_data():
 
         return "invalid", 200
 
-@app.route("/logout")
+@app.route("/logout", methods=["GET"])
 def logout():
 
     # Limpiamos la sessión y lo redirigimos al form
     session.clear()
     return redirect(url_for("form"))
 
-@app.route("/download_results", methods = ["GET"])
-@logged
-@authenticate
-def download_results():
-
-    if last_db_update != last_file_update:
-
-        res = update_results_files()
-        if res == None:
-        
-            flash("Todavía no hay suficientes datos.","Warning")
-            return redirect(url_for("dashboard"))
-
-    return send_file(os.getcwd() + app.config["RESULTS_FILE"])
-
-
-@app.errorhandler(500)
-def error500(e):
-    return render_template('error/500.html'), 500
-
-@app.errorhandler(404)
-def error404(e):
-    return render_template('error/404.html'), 404
-
-def prepare_args(test_type):
-
-    # Obtenemos las instrucciones correspondientes
-    # instructions = [x for x in tests_data if x['test_type'] == test_type][0]
-
-    if 'instructions' in tests_data[test_type]:
-        instructions = tests_data[test_type]['instructions']
-    else:
-        instructions = None
-
-    if test_type != 'F':
-
-        args = {
-            'title': "Prototipo 1",
-            'test_type': test_type,
-            'instructions': instructions,
-        }
-
-    else:
-
-        args = {
-            'title': "Prototipo 1",
-            'test_type': test_type,
-            'instructions': instructions,
-            'table_training': tests_data["F"]["data"]["table_training"],
-            'n_training':tests_data["F"]["data"]["n_training"],
-            'table_test': tests_data["F"]["data"]["table_test"],
-            'n_test':tests_data["F"]["data"]["n_test"],
-            'target_symbol': "svg" + str(tests_data["F"]["data"]["target_symbol"])  + ".html" ,
-            'target_number': tests_data["F"]["data"]["target_symbol"]
-        }
-
-    return args
-
-@app.route('/login', methods=['GET','POST'])
-def login():
-
-    # Si se hace una petición GET
-    if request.method == 'GET':
-        try:
-            return render_template('login.html')
-        except TemplateNotFound:
-            abort(404)
-
-    # Si se hace una petición POST
-    elif request.method == 'POST':
-
-        # Recogemos los valores del formulario
-        user = request.values['user']
-        password =  request.values['password']
-
-        # Comprobamos si existe en la base de datos
-        if user == app.config['ADMIN_USER'] and password == app.config['ADMIN_PASS']:
-
-            # Establecemos una cookie de sesión con el identificador del usuario
-            session['id'] = app.config['ADMIN_ID']
-
-            # Si existe, lo redirigimos al dasboard
-            return redirect(url_for('dashboard'))
-
-        # En caso de que no exista, lanzamos una alerta y lo redirigimos al login
-        else:
-            flash("Usuario no encontrado.", "Warning")
-            return redirect(url_for('login'))
-
-@app.route('/show_results', methods=['GET','POST'])
-@logged
-@authenticate
-def show_results():
-
-    if last_db_update != last_file_update:
-
-        res = update_results_files()
-        if res == None:
-        
-            flash("Todavía no hay suficientes datos.","Warning")
-            return redirect(url_for("dashboard"))
-
-
-    df = pd.read_pickle(os.getcwd() + app.config["PICKLE"], compression='infer', storage_options=None)
-
-    html = Markup(df.to_html(classes=["table-bordered", "table-striped", "table-hover"]))
-
-    # Preparamos los argumentos de la página
-    args = {
-        'title':'Prototipo',
-        'html':html,
-        'user_number':df['name'].count(),
-        'A_number':df['endTime_A'].count(),
-        'B_number':df['endTime_B'].count(),
-        'C_number':df['endTime_C'].count(),
-        'D_number':df['endTime_D'].count(),
-        'E_number':df['endTime_E'].count(),
-        'F_number':df['endTime_F'].count()
-    }
-
-
-    if session['id'] == app.config['ADMIN_ID']:
-        args['admin'] = True
-
-    return render_template("results.html", args = args)
-
-def update_results_files():
-
-    users =  pd.DataFrame(data = list(db.trail_making_test.users.find()))
-    results =  pd.DataFrame(data = list(db.trail_making_test.results.find()))
-
-    if users.empty:
-        return None
-
-    elif results.empty:
-        return None
-
-    else:
-        users = users.set_index('id').drop('_id',axis="columns")
-        results = results.set_index('id').drop('_id',axis="columns")
-
-    to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
-    to_join.append(users)
-    tmp = pd.concat(to_join, axis=1)
-
-    to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
-    for x in to_remove:
-        if x in tmp.columns:
-            del tmp[x]
-
-    tmp.to_excel(os.getcwd() + app.config["RESULTS_FILE"])
-    tmp.to_pickle(os.getcwd() + app.config['PICKLE'])
-    return True

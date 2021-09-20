@@ -10,7 +10,7 @@
                 "test_type": "A",
                 "test_image": "imgs/A.png",
                 "instructions": ["Este test consta de una serie de círculos con un número en su interior.", "El objetivo es unir los círculos, empezando por el 1 y siguiendo en orden ascendente.", "Primero, se realizará una prueba, y después se pasará a realizar la prueba definitiva."],
-                "template": "tmt_template.html"
+                "template": "public/tmt.html"
             },
             "2": {
                 "test_name": "Nodos B",
@@ -18,7 +18,7 @@
                 "test_type": "B",
                 "test_image": "imgs/B.png",
                 "instructions": ["Este test consta de una serie de círculos con un número en su interior.", "El objetivo es unir los círculos, empezando por el 1 y siguiendo en orden ascendente.", "Primero, se realizará una prueba, y después se pasará a realizar la prueba definitiva."],
-                "template": "tmt_template.html"
+                "template": "public/tmt.html"
             },
             "3": {
                 "test_name": "Nodos C 1",
@@ -26,7 +26,7 @@
                 "test_type": "C",
                 "instructions": ["Este test consta de una serie de círculos con un número en su interior.", "El objetivo es unir los círculos, empezando por el 1 y siguiendo en orden ascendente.", "Primero, se realizará una prueba, y después se pasará a realizar la prueba definitiva."],
                 "test_image": "imgs/C.png",
-                "template": "tmt_template.html"
+                "template": "public/tmt.html"
             },
             "4": {
                 "test_name": "Nodos C 2",
@@ -34,7 +34,7 @@
                 "test_type": "D",
                 "instructions": ["Este test consta de una serie de círculos con un número en su interior.", "El objetivo es unir los círculos, empezando por el 1 y siguiendo en orden ascendente.", "Primero, se realizará una prueba, y después se pasará a realizar la prueba definitiva."],
                 "test_image": "imgs/C.png",
-                "template": "tmt_template.html"
+                "template": "public/tmt.html"
             },
             "5": {
                 "test_name": "Nodos meses",
@@ -42,7 +42,7 @@
                 "test_type": "E",
                 "instructions": ["Este test consta de una serie de círculos con un número en su interior.", "El objetivo es unir los círculos, empezando por el 1 y siguiendo en orden ascendente.", "Primero, se realizará una prueba, y después se pasará a realizar la prueba definitiva."],
                 "test_image": "imgs/D.png",
-                "template": "tmt_template.html"
+                "template": "public/tmt.html"
             },
             "6": {
                 "test_name": "Atención selectiva",
@@ -50,7 +50,7 @@
                 "test_type": "F",
                 "instructions": ["Este test consta de una serie de círculos con un número en su interior.", "El objetivo es unir los círculos, empezando por el 1 y siguiendo en orden ascendente.", "Primero, se realizará una prueba, y después se pasará a realizar la prueba definitiva."],
                 "test_image": "imgs/E.png",
-                "template": "cancellation.html",
+                "template": "public/cancellation.html",
                 "data": {
                     "target_symbol": 2,
                     "table_training": [

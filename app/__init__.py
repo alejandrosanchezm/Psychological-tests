@@ -7,8 +7,10 @@ import json
 import numpy as np
 from datetime import date
 
-app = Flask(__name__,static_folder='static')
+app = Flask(__name__,template_folder='templates', static_folder='static')
+
 app.config.from_object(ProductionConfig)
+
 app.permanent_session_lifetime = datetime.timedelta(days=1)
 
 tests_data = dict((v['test_type'], v) for v in list(json.load(open(app.config['TEST_FILE'],))['data']['tests'].values()))
@@ -22,7 +24,6 @@ last_db_update =  date.today()
 last_file_update = date.today() - datetime.timedelta(days=1)
 
 CORS(app)
-#db = MongoClient('127.0.0.1', 27017)
 db = MongoClient("mongodb+srv://admin:eKB139Mm@cluster0.nh98u.mongodb.net/trail_making_test?retryWrites=true&w=majority")
 
 from app import views

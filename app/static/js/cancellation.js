@@ -30,7 +30,6 @@ let seconds = 0;
 
 let correct_clicked = [];
 let error_clicked = [];
-let errors;
 let errors = {
     'desclickados': {},
     'errores': {},

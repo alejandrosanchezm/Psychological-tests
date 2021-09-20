@@ -572,6 +572,8 @@ let pos, n_nodes;
 let sent = false;
 const timer_var = 6;
 let fixed_fc;
+let showed_instructions = false;
+var timeout_interval = null;
 
 function closemodal() {
 
@@ -581,13 +583,15 @@ function closemodal() {
 
 function show_instructions() {
 
-    if (document.body.contains(document.getElementById("instructions"))) {
-        $('#instructions').modal("show");
-        setInterval("closemodal()", 20000);
+    if (!showed_instructions) {
+        showed_instructions = true;
+        if (document.body.contains(document.getElementById("instructions"))) {
+            $('#instructions').modal("show");
+            setInterval("closemodal()", 20000);
+        }
+
+        document.getElementById("screen_msg").style.display = "none";
     }
-
-    document.getElementById("screen_msg").style.display = "none";
-
 }
 
 function show_screen_error_msg() {
@@ -718,32 +722,6 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/*
-    REGISTERRESULTS: almacena los resultados de una partida en un fichero
-*/
-function registerResults() {
-
-    if (sent == false) {
-
-        sent = true;
-        var node_time = []
-        game.nodes.forEach(node => { node_time.push(node.time) })
-
-        results = {
-            'endTime': endTime,
-            'n_errors': game.n_errors,
-            'times': node_time
-        };
-
-        // Si hemos terminado las partidas, enviamos los resultados
-        if (test_number == config[test_type]['n_test']) {
-            document.getElementById("saveName").style.display = "flex";
-            document.getElementById("bg").style.display = "flex";
-        }
-    }
-
-
-}
 
 function sendDataToBE() {
     if (sent == false) {
@@ -767,11 +745,16 @@ function sendDataToBE() {
                 data: { "results": JSON.stringify(results) },
                 dataType: 'application/json',
                 async: true,
-                success: window.location.href = "/dashboard"
+                success: redirect_to_dashboard()
             });
         }
     }
 
+}
+
+function redirect_to_dashboard() {
+    window.location.replace("/dashboard");
+    window.location.reload(true);
 }
 
 /*
@@ -827,10 +810,13 @@ async function programLogic() {
                 if (test_number == config[test_type]['n_test']) {
                     // registerResults();
                     sendDataToBE();
+
                 } else {
+
                     test_number++;
                     preload();
                     setup();
+                    set_timeout();
                 }
 
 
@@ -839,6 +825,19 @@ async function programLogic() {
 
     }
 }
+
+function set_timeout() {
+
+    if (timeout_interval != null) clearInterval(timeout_interval);
+    var timeout_interval = setInterval(show_end_timeout(), 60 * 2 * 1000);
+}
+
+function show_end_timeout() {
+
+    $("#timeout").modal("show");
+    setInterval(redirect_to_dashboard(), 5000);
+}
+
 /*
             =========================================================================
                                 DRAW (SE EJECUTA POR CADA FRAME)
