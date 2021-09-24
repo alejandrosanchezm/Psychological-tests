@@ -11,7 +11,6 @@ from datetime import date
 import os
 from jinja2 import TemplateNotFound
 
-
 @app.route("/download_results", methods = ["GET"])
 @logged
 @authenticate
@@ -28,12 +27,12 @@ def download_results():
     return send_file(os.getcwd() + app.config["RESULTS_FILE"])
 
 @app.route('/login', methods=['GET','POST'])
-def admin_login():
+def login():
 
     # Si se hace una petición GET
     if request.method == 'GET':
         try:
-            return render_template('login.html')
+            return render_template('private/login.html')
         except TemplateNotFound:
             abort(404)
 
@@ -95,7 +94,6 @@ def show_results():
 
     return render_template("results.html", args = args)
 
-
 @app.route("/tests/<test_type>", methods = ["GET"])
 @logged
 def tests(test_type):
@@ -119,7 +117,7 @@ def tests(test_type):
         return redirect(url_for("dashboard"))
 
 @app.route('/store_data', methods=["POST"])
-def store_data():
+def store_data():6
 
     if 'id' in session:
         
@@ -148,21 +146,12 @@ def store_data():
 
         return "Not valid request", 400
 
-
 @app.route("/dashboard", methods = ["GET"])
 @logged
 def dashboard():
-        
+
     # Buscamos qué test han sido ya copletados por el usuario
     completed = [x['type'] for x in db.trail_making_test.results.find({'id': session['id']})]
-
-    def isCompleted(x,completed):
-        if x['test_type'] in completed:
-            x['completed'] = True
-        else:
-            x['completed'] = False
-        return x
-
     my_data = [isCompleted(x,completed) for x in tests_data.values()]
 
     # Preparamos los argumentos de la página

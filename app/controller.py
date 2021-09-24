@@ -63,3 +63,10 @@ def prepare_args(test_type):
         }
 
     return args
+
+def isCompleted(x,completed):
+    if x['test_type'] in completed:
+        x['completed'] = True
+    else:
+        x['completed'] = False
+    return x

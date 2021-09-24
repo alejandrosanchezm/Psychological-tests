@@ -22,7 +22,7 @@ def authenticate(f):
                 return f(*args, **kwargs)
             else:
                 flash("Tienes que ser administrador para acceder ahí.", "Danger")
-                return redirect(url_for(request.url))              
+                return redirect(url_for("dashboard"))              
     return wrapper
 
 @app.after_request

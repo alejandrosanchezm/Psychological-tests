@@ -634,6 +634,8 @@ function preload() {
         start_node = new Node(config[test_type][test_number]['start_node'][0], config[test_type][test_number]['start_node'][1], game.size, "", 'circle');
         is_in_pos = false;
 
+        console.log(test_number);
+
         // Comprobamos las medidas de la pantalla
 
     } else {
@@ -754,7 +756,6 @@ function sendDataToBE() {
 
 function redirect_to_dashboard() {
     window.location.replace("/dashboard");
-    window.location.reload(true);
 }
 
 /*
@@ -816,7 +817,7 @@ async function programLogic() {
                     test_number++;
                     preload();
                     setup();
-                    set_timeout();
+                   // set_timeout();
                 }
 
 

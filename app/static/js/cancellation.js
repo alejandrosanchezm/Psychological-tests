@@ -28,11 +28,12 @@ let target_number;
 let minutes = 0;
 let seconds = 0;
 
-let correct_clicked = [];
-let error_clicked = [];
-let errors = {
+let data = {
     'desclickados': {},
     'errores': {},
+    'correct_clicked': [],
+    'error_clicked': [],
+    'final_data': 0
 };
 
 let results = {};
@@ -123,29 +124,29 @@ function training_logic(x) {
 
     if (x.value == target_number && x.id != "_") {
 
-        if (correct_clicked.includes(x.id)) {
+        if (data['correct_clicked'].includes(x.id)) {
 
-            correct_clicked = arrayRemove(correct_clicked, x.id)
+            data['correct_clicked'] = arrayRemove(data['correct_clicked'], x.id)
             n_training++;
 
         } else {
-            correct_clicked.push(x.id);
+            data['correct_clicked'].push(x.id);
             n_training--;
-            if (n_training == 0 && error_clicked.length == 0) {
-                correct_clicked = [];
+            if (n_training == 0 && data['error_clicked'].length == 0) {
+                data['correct_clicked'] = [];
                 start_test();
             }
         }
 
     } else if (x.value != target_number) {
-        if (error_clicked.includes(x.id)) {
-            error_clicked = arrayRemove(error_clicked, x.id);
-            if (n_training == 0 && error_clicked.length == 0) {
-                correct_clicked = [];
+        if (data['error_clicked'].includes(x.id)) {
+            data['error_clicked'] = arrayRemove(data['error_clicked'], x.id);
+            if (n_training == 0 && data['error_clicked'].length == 0) {
+                data['correct_clicked'] = [];
                 start_test();
             }
         } else {
-            error_clicked.push(x.id);
+            data['error_clicked'].push(x.id);
         }
     }
 
@@ -154,37 +155,37 @@ function training_logic(x) {
 function test_logic(x) {
 
     if (x.value == target_number && x.id != "_") {
-        if (correct_clicked.includes(x.id)) {
-            correct_clicked = arrayRemove(correct_clicked, x.id)
+        if (data['correct_clicked'].includes(x.id)) {
+            data['correct_clicked'] = arrayRemove(data['correct_clicked'], x.id)
             n_test++;
-            if (x.id in errors['desclickados']) {
-                errors['desclickados'][x.id]++;
+            if (x.id in data['desclickados']) {
+                data['desclickados'][x.id]++;
             } else {
-                errors['desclickados'][x.id] = 1;
+                data['desclickados'][x.id] = 1;
             }
         } else {
-            correct_clicked.push(x.id);
+            data['correct_clicked'].push(x.id);
             n_test--;
-            if (n_test == 0 && error_clicked.length == 0) {
+            if (n_test == 0 && data['error_clicked'].length == 0) {
                 sendDataToBE();
             }
         }
     } else if (x.value != target_number) {
 
-        if (error_clicked.includes(x.id)) {
-            error_clicked = arrayRemove(error_clicked, x.id);
-            errors--;
-            if (n_test == 0 && error_clicked.length == 0) {
-                correct_clicked = [];
+        if (data['error_clicked'].includes(x.id)) {
+            data['error_clicked'] = arrayRemove(data['error_clicked'], x.id);
+            data['final_errors']--;
+            if (n_test == 0 && data['error_clicked'].length == 0) {
+                data['correct_clicked'] = [];
                 start_test();
             }
         } else {
-            error_clicked.push(x.id);
-            errors++;
-            if (x.id in errors['errores']) {
-                errors['errores'][x.id]++;
+            data['error_clicked'].push(x.id);
+            data['final_errors']++;
+            if (x.id in data['errores']) {
+                data['errores'][x.id]++;
             } else {
-                errors['errores'][x.id] = 1;
+                data['errores'][x.id] = 1;
             }
         }
     }
@@ -278,10 +279,9 @@ function sendDataToBE() {
 
         results = {
             'endTime': time,
-            'errors': errors,
+            'data': errors,
             'type': "F",
             'n_test': n_test,
-            "final_errors": errors
         };
 
         $.ajax({
@@ -289,7 +289,7 @@ function sendDataToBE() {
             url: "/store_data",
             data: { "results": JSON.stringify(results) },
             dataType: 'application/json',
-            async: true,
+            async: false,
             success: window.location.href = "/dashboard"
         });
     }
