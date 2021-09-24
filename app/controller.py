@@ -18,17 +18,22 @@ def update_results_files():
         results = results.set_index('id').drop('_id',axis="columns")
 
     to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
-    to_join = to_join.append(users)
-    tmp = pd.concat(to_join, axis=1)
+    to_join.append(users)
 
-    to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
-    for x in to_remove:
-        if x in tmp.columns:
-            del tmp[x]
+    if to_join != None:
+        tmp = pd.concat(to_join, axis=1)
 
-    tmp.to_excel(os.getcwd() + app.config["RESULTS_FILE"])
-    tmp.to_pickle(os.getcwd() + app.config['PICKLE'])
-    return True
+        to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
+        for x in to_remove:
+            if x in tmp.columns:
+                del tmp[x]
+
+        tmp.to_excel(os.getcwd() + app.config["RESULTS_FILE"])
+        tmp.to_pickle(os.getcwd() + app.config['PICKLE'])
+        return True
+
+    else:
+        return None
 
 def prepare_args(test_type):
 
