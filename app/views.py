@@ -117,7 +117,7 @@ def tests(test_type):
         return redirect(url_for("dashboard"))
 
 @app.route('/store_data', methods=["POST"])
-def store_data():6
+def store_data():
 
     if 'id' in session:
         
