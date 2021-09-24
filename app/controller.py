@@ -18,7 +18,7 @@ def update_results_files():
         results = results.set_index('id').drop('_id',axis="columns")
 
     to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
-    to_join.append(users)
+    to_join = to_join.append(users)
     tmp = pd.concat(to_join, axis=1)
 
     to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
