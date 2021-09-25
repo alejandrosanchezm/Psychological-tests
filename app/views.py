@@ -131,6 +131,7 @@ def store_data():
 
                 # Guardamos los datos en bbdd
                 db.trail_making_test.results.insert_one(data)
+                setCompleted(id, data['type'])
 
                 last_db_update = date.today()
 
@@ -153,6 +154,7 @@ def dashboard():
     # Buscamos qué test han sido ya copletados por el usuario
     completed = [x['type'] for x in db.trail_making_test.results.find({'id': session['id']})]
     my_data = [isCompleted(x,completed) for x in tests_data.values()]
+    #completed = getCompleted(id)
 
     # Preparamos los argumentos de la página
     args = {
@@ -170,9 +172,7 @@ def form():
 
     if request.method == "GET":
 
-        args = {
-            'title': 'Prototipo1'
-        }
+        args = {'title': 'Neuropsycological Test'}
         return render_template("public/form.html", args = args)
         
     elif request.method == "POST":
@@ -188,6 +188,7 @@ def form():
         # Añadimos el identificador de sesión a las cookies y a la bbdd
         data['id'] = session['id'] = str(uuid.uuid4())
 
+        # Añadimos la fecha de creación del usuario
         data['date'] =  date.today().strftime("%d/%m/%Y")
 
         # Guardamos los datos en la bbdd

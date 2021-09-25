@@ -37,26 +37,26 @@ def update_results_files():
 
 def prepare_args(test_type):
 
-    # Obtenemos las instrucciones correspondientes
-    # instructions = [x for x in tests_data if x['test_type'] == test_type][0]
-
+    # Si existen instrucciones, se añadem
     if 'instructions' in tests_data[test_type]:
         instructions = tests_data[test_type]['instructions']
     else:
         instructions = None
 
+    # En caso de que el test sea el tipo F
     if test_type != 'F':
 
         args = {
-            'title': "Prototipo 1",
+            'title': "Neuropsychological Test",
             'test_type': test_type,
             'instructions': instructions,
         }
 
+    # En caso de que sea de otro tipo
     else:
 
         args = {
-            'title': "Prototipo 1",
+            'title': "Neuropsychological Test",
             'test_type': test_type,
             'instructions': instructions,
             'table_training': tests_data["F"]["data"]["table_training"],
@@ -75,3 +75,4 @@ def isCompleted(x,completed):
     else:
         x['completed'] = False
     return x
+
