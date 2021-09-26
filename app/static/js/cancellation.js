@@ -279,7 +279,7 @@ function sendDataToBE() {
 
         results = {
             'endTime': time,
-            'data': errors,
+            'data': data,
             'type': "F",
             'n_test': n_test,
         };

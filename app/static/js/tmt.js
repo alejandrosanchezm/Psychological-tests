@@ -534,7 +534,6 @@ class Game {
                         this.lock = true;
                         this.nodes[i].error();
                         this.n_errors++;
-                        console.log(this.n_errors);
                     }
                 }
 
@@ -634,7 +633,6 @@ function preload() {
         start_node = new Node(config[test_type][test_number]['start_node'][0], config[test_type][test_number]['start_node'][1], game.size, "", 'circle');
         is_in_pos = false;
 
-        console.log(test_number);
 
         // Comprobamos las medidas de la pantalla
 
@@ -746,7 +744,7 @@ function sendDataToBE() {
                 url: "/store_data",
                 data: { "results": JSON.stringify(results) },
                 dataType: 'application/json',
-                async: true,
+                async: false,
                 success: redirect_to_dashboard()
             });
         }
