@@ -2,7 +2,7 @@ from app import *
 from app.decorators import *
 from app.controller import *
 from flask import render_template, request, redirect, url_for, session, send_file, flash, abort, Markup
-
+ 
 import json
 import uuid
 import pandas as pd
@@ -10,6 +10,7 @@ import re
 from datetime import date
 import os
 from jinja2 import TemplateNotFound
+
 
 @app.route("/download_results", methods = ["GET"])
 @logged
@@ -131,8 +132,8 @@ def store_data():
 
                 # Guardamos los datos en bbdd
                 db.trail_making_test.results.insert_one(data)
-                setCompleted(id, data['type'])
 
+                # Actualizamos la fecha de actualización
                 last_db_update = date.today()
 
                 return "OK", 200
@@ -140,6 +141,7 @@ def store_data():
             except Exception as e:
                 
                 return "fail", 500
+
         else:
             return "Not valid request", 400
 
@@ -151,19 +153,17 @@ def store_data():
 @logged
 def dashboard():
 
+
     # Buscamos qué test han sido ya copletados por el usuario
     completed = [x['type'] for x in db.trail_making_test.results.find({'id': session['id']})]
     my_data = [isCompleted(x,completed) for x in tests_data.values()]
-    #completed = getCompleted(id)
 
     # Preparamos los argumentos de la página
     args = {
         'title':'Prototipo',
-        'tests':my_data
+        'tests':my_data,
+        'admin':session['id'] == app.config['ADMIN_ID']
     }
-
-    if session['id'] == app.config['ADMIN_ID']:
-        args['admin'] = True
 
     return render_template("public/dashboard.html",args=args)
 
@@ -194,6 +194,7 @@ def form():
         # Guardamos los datos en la bbdd
         db.trail_making_test.users.insert_one(data)
 
+        # Actualizamos la fecha de actualización
         last_db_update = date.today()
 
         # Lo redirigimos al dashboard

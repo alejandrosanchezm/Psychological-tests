@@ -577,6 +577,7 @@ var timeout_interval = null;
 function closemodal() {
 
     $('#instructions').modal('hide');
+    set_timeout();
 }
 
 
@@ -615,6 +616,7 @@ function check_if_correct_screen_size() {
 
 function preload() {
 
+    // Comprobamos las medidas de la pantalla
     if (check_if_correct_screen_size()) {
 
         // Mostramos las instrucciones
@@ -632,9 +634,6 @@ function preload() {
         game = new Game(n_nodes, test_type, pos);
         start_node = new Node(config[test_type][test_number]['start_node'][0], config[test_type][test_number]['start_node'][1], game.size, "", 'circle');
         is_in_pos = false;
-
-
-        // Comprobamos las medidas de la pantalla
 
     } else {
 
@@ -673,8 +672,6 @@ function setup() {
     } else {
         document.getElementById("defaultCanvas0").style.display = "none";
     }
-
-
 
 }
 
@@ -752,7 +749,8 @@ function sendDataToBE() {
 
 }
 
-function redirect_to_dashboard() {
+async function redirect_to_dashboard() {
+    await this.sleep(0.1);
     window.location.replace("/dashboard");
 }
 
@@ -815,10 +813,9 @@ async function programLogic() {
                     test_number++;
                     preload();
                     setup();
-                   // set_timeout();
+                    reset_timeout();
+
                 }
-
-
             }
         }
 
@@ -827,14 +824,19 @@ async function programLogic() {
 
 function set_timeout() {
 
+    timeout_interval = setInterval(show_end_timeout, 125000);
+}
+
+function reset_timeout() {
+
     if (timeout_interval != null) clearInterval(timeout_interval);
-    var timeout_interval = setInterval(show_end_timeout(), 60 * 2 * 1000);
+    timeout_interval = setInterval(show_end_timeout, 120000);
 }
 
 function show_end_timeout() {
 
     $("#timeout").modal("show");
-    setInterval(redirect_to_dashboard(), 5000);
+    setInterval(redirect_to_dashboard, 50000);
 }
 
 /*

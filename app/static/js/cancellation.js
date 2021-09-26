@@ -257,7 +257,7 @@ function countdown() {
         document.getElementById("demo").innerHTML = minutes + "m " + seconds + "s ";
 
         // If the count down is finished, write some text
-        if (distance <= 0) {
+        if (minutes == 0 && seconds == 0) {
             clearInterval(x);
             sendDataToBE();
         }
@@ -290,7 +290,17 @@ function sendDataToBE() {
             data: { "results": JSON.stringify(results) },
             dataType: 'application/json',
             async: false,
-            success: window.location.href = "/dashboard"
+            success: redirect_to_dashboard()
         });
     }
+}
+
+
+async function redirect_to_dashboard() {
+    await sleep(0.1);
+    window.location.replace("/dashboard");
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

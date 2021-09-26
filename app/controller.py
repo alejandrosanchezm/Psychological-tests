@@ -7,6 +7,7 @@ def update_results_files():
     users =  pd.DataFrame(data = list(db.trail_making_test.users.find()))
     results =  pd.DataFrame(data = list(db.trail_making_test.results.find()))
 
+
     if users.empty:
         return None
 
@@ -14,14 +15,15 @@ def update_results_files():
         return None
 
     else:
-        users = users.set_index('id').drop('_id',axis="columns")
-        results = results.set_index('id').drop('_id',axis="columns")
+        users = users.drop('_id',axis="columns").set_index('id')
+        results = results.drop('_id',axis="columns").set_index('id')
 
     to_join = [results[results['type'] == x].add_suffix('_' + x) for x in ["A","B","C","D","E","F"]]
     to_join.append(users)
 
     if to_join != None:
-        tmp = pd.concat(to_join, axis=1)
+
+        tmp = pd.concat(to_join)
 
         to_remove = ['type_' + x for x in ["A","B","C","D","E","F"]]+ ['errors_' + x for x in ["A","B","C","D","E"]] + ['n_test_' + x for x in ["A","B","C","D","E"]] + ['n_errors_F','times_F']
         for x in to_remove:
@@ -30,6 +32,7 @@ def update_results_files():
 
         tmp.to_excel(os.getcwd() + app.config["RESULTS_FILE"])
         tmp.to_pickle(os.getcwd() + app.config['PICKLE'])
+        
         return True
 
     else:
