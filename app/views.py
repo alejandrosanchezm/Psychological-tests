@@ -20,7 +20,7 @@ def download_results():
     if last_db_update != last_file_update:
 
         res = update_results_files()
-        if res == None:
+        if not res:
         
             flash("Todavía no hay suficientes datos.","Warning")
             return redirect(url_for("dashboard"))
@@ -66,7 +66,7 @@ def show_results():
     if last_db_update != last_file_update:
 
         res = update_results_files()
-        if res == None:
+        if not res:
         
             flash("Todavía no hay suficientes datos.","Warning")
             return redirect(url_for("dashboard"))
@@ -106,7 +106,7 @@ def tests(test_type):
         template = tests_data[test_type]['template']
 
         # Preparamos los argumentos
-        args = prepare_args(test_type)
+        args = prepare_test_args(test_type)
 
         # Renderizamos la plantilla
         return render_template(template,args=args)
@@ -122,28 +122,35 @@ def store_data():
 
     if 'id' in session:
         
-        if 'results' in request.form:
-
-            data = json.loads(request.form['results'])
-            try:
-
-                # Añadimos a los datos a guardar el identificador del usuario
-                data['id'] = session['id']
-
-                # Guardamos los datos en bbdd
-                db.trail_making_test.results.insert_one(data)
-
-                # Actualizamos la fecha de actualización
-                last_db_update = date.today()
-
-                return "OK", 200
-
-            except Exception as e:
-                
-                return "fail", 500
+        if session['id'] == app.config['ADMIN_ID']:
+        
+            return "OK", 200
 
         else:
-            return "Not valid request", 400
+
+            if 'results' in request.form:
+
+                data = json.loads(request.form['results'])
+            
+                try:
+
+                    # Añadimos a los datos a guardar el identificador del usuario
+                    data['id'] = session['id']
+
+                    # Guardamos los datos en bbdd
+                    db.trail_making_test.results.insert_one(data)
+
+                    # Actualizamos la fecha de actualización
+                    last_db_update = date.today()
+
+                    return "OK", 200
+
+                except Exception as e:
+                    
+                    return "fail", 500
+
+            else:
+                return "Not valid request", 400
 
     else:
 
@@ -153,19 +160,14 @@ def store_data():
 @logged
 def dashboard():
 
-
-    # Buscamos qué test han sido ya copletados por el usuario
-    completed = [x['type'] for x in db.trail_making_test.results.find({'id': session['id']})]
-    my_data = [isCompleted(x,completed) for x in tests_data.values()]
-
     # Preparamos los argumentos de la página
-    args = {
-        'title':'Prototipo',
-        'tests':my_data,
-        'admin':session['id'] == app.config['ADMIN_ID']
-    }
+    args = prepare_dashboard_args()
 
-    return render_template("public/dashboard.html",args=args)
+    if session['id'] == app.config['ADMIN_ID']:
+        return render_template("private/dashboard.html",args=args)
+    else:
+        # Devolvemos la página
+        return render_template("public/dashboard.html",args=args)
 
 @app.route("/",methods=["GET", "POST"])
 def form():
