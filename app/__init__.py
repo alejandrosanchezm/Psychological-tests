@@ -24,6 +24,6 @@ last_db_update =  date.today()
 last_file_update = date.today() - datetime.timedelta(days=1)
 
 CORS(app)
-db = MongoClient("mongodb+srv://admin:eKB139Mm@cluster0.nh98u.mongodb.net/trail_making_test?retryWrites=true&w=majority")
+db = MongoClient("mongodb+srv://admin:XXXXX@cluster0.nh98u.mongodb.net/trail_making_test?retryWrites=true&w=majority")
 
 from app import views, error
